@@ -5,13 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Print info
-        run: echo "$GITHUB_WORKSPACE"
       - name: Create build directory
         run: mkdir $GITHUB_WORKSPACE/build
       - name: Run CMake
-        run: cmake -S$GITHUB_WORKSPACE -B$GITHUB_WORKSPACE/build
+        run: cmake ../
+        working-directory: ${{ github.workspace	}}/build
       - name: Make targets
-        run: make -C $GITHUB_WORKSPACE/build -j$(nproc)
+        run: make -j$(nproc)
+        working-directory: ${{ github.workspace	}}/build
       - name: Test
-        run: $GITHUB_WORKSPACE/build/litecrypt_test
+        run: ./litecrypt_test
+        working-directory: ${{ github.workspace	}}/build
