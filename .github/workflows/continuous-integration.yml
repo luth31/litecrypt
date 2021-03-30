@@ -10,7 +10,10 @@ jobs:
       - name: Create build folder
         run: mkdir $GITHUB_WORKSPACE/build
       - name: Run CMake
-        run: cmake $GITHUB_WORKSPACE
+        run: |
+          pwd
+          ls
+          cmake $GITHUB_WORKSPACE
         working-directory: $GITHUB_WORKSPACE/build
       - name: Make targets
         run: make -j$(nproc)
