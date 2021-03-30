@@ -1,0 +1,15 @@
+name: litecrypt-ci
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create build folder
+      - run: mkdir build && cd build
+      - name: Run CMake
+      - run: cmake ../
+      - name: Make targets
+      - run: make -j$(nproc)
+      - run: pwd
+      - run: ls
