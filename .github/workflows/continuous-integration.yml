@@ -5,7 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Create build folder
+      - name: Print info
+        run: echo "$GITHUB_WORKSPACE"
+      - name: Create build folde
         run: |
           cd $GITHUB_WORKSPACE/litecrypt
           mkdir build
