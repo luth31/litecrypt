@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Create build folder
         run: |
-          cd $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE/litecrypt
           mkdir build
           cd build
       - name: Run CMake
