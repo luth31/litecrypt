@@ -8,11 +8,10 @@ jobs:
       - name: Print info
         run: echo "$GITHUB_WORKSPACE"
       - name: Create build folde
-        run: |
-          cd $GITHUB_WORKSPACE/litecrypt
-          mkdir build
-          cd build
+        run: mkdir $GITHUB_WORKSPACE/build
       - name: Run CMake
         run: cmake ../
+        working-directory: $GITHUB_WORKSPACE/build
       - name: Make targets
         run: make -j$(nproc)
+        working-directory: $GITHUB_WORKSPACE/build
