@@ -6,10 +6,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create build folder
-        run: mkdir build && cd build
+        run: >
+          cd $GITHUB_WORKSPACE
+          mkdir build
+          cd build
       - name: Run CMake
         run: cmake ../
       - name: Make targets
         run: make -j$(nproc)
-      - run: pwd
-      - run: ls
