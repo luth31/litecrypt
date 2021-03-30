@@ -14,7 +14,6 @@ jobs:
           pwd
           ls
           cmake $GITHUB_WORKSPACE
-        working-directory: $GITHUB_WORKSPACE/build
       - name: Make targets
         run: make -j$(nproc)
         working-directory: $GITHUB_WORKSPACE/build
