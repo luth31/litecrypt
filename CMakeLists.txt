@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
+# Disable generation in source directory
+set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+
 project(litecrypt VERSION 0.0.1 DESCRIPTION "An amateur cryptographic library" LANGUAGES C)
 
 # Set default build type to Release
