@@ -6,10 +6,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create build folder
-      - run: mkdir build && cd build
+        run: mkdir build && cd build
       - name: Run CMake
-      - run: cmake ../
+        run: cmake ../
       - name: Make targets
-      - run: make -j$(nproc)
+        run: make -j$(nproc)
       - run: pwd
       - run: ls
