@@ -18,6 +18,7 @@ file(GLOB SOURCES
 # Create object from collected sources and include headers
 add_library(objlib OBJECT ${SOURCES})
 target_include_directories(objlib PUBLIC include)
+target_include_directories(objlib PRIVATE src)
 
 # Enable PIC for correct function of shared library
 set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)

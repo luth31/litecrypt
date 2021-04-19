@@ -1,8 +1,7 @@
-#include "test.h"
+#include "aes.h"
 #include "stdio.h"
 
 int main(int argc, char** argv) {
-    printf("%s", test());
-
+    test_public();
     return 0;
 }
