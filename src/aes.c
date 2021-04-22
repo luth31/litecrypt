@@ -1,12 +1,34 @@
 #include "aes.h"
 #include "_aes.h"
-#include "stdio.h"
 
-void test_private() {
-    printf("Private function()\n");
+void AddRoundKey() {
+
 }
 
-void test_public() {
-    test_private();
-    printf("Public function()\n");
+void MixColumns() {
+
+}
+
+void ShiftRows() {
+
+}
+
+void SubBytes() {
+
+}
+
+void SubWord() {
+
+}
+
+void InvMixColumns() {
+
+}
+
+void InvShiftRows() {
+
+}
+
+void InvSubBytes() {
+
 }
