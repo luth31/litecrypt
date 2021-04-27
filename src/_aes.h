@@ -38,11 +38,32 @@ static const uint8_t sbox_inv[256] = {
     0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61, 
     0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d };
 
+static const uint32_t Rcon[11] = { 0, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x1B000000, 0x36000000 };
+
+// AES state block size is 128 bits
+typedef struct {
+    uint32_t word[4];
+} AES_State;
+
+typedef struct {
+    uint32_t* data;
+    uint8_t size;
+} AES_Key;
+
+typedef struct {
+    uint32_t* data;
+    uint8_t size;
+    uint8_t rounds;
+} AES_RoundKey;
+
+void Cipher();
+void ExpandKey(AES_Key* key, AES_RoundKey* rkey);
 void AddRoundKey();
 void MixColumns();
 void ShiftRows();
 void SubBytes();
-void SubWord();
+uint32_t SubWord(uint32_t word);
+uint32_t RotWord(uint32_t word);
 
 void InvMixColumns();
 void InvShiftRows();
