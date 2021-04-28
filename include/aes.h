@@ -6,11 +6,15 @@
 typedef struct {
     AES_Key* key;
     AES_RoundKey* roundKey;
-    uint8_t rounds;
 } AES_Ctx;
 
+enum AES_KEY_SIZE {
+    AES_KEY_128 = 4,
+    AES_KEY_192 = 6,
+    AES_KEY_256 = 8
+};
 
-void AES_Init(AES_Ctx* ctx, AES_Key* key);
+AES_Ctx* AES_Init(enum AES_KEY_SIZE key_size, uint32_t* key);
 uint32_t* AES_Encrypt(AES_Ctx* ctx, uint32_t data);
 uint32_t* AES_Decrypt(AES_Ctx* ctx, uint32_t data);
 #endif

@@ -1,9 +1,36 @@
 #include "aes.h"
 #include "_aes.h"
-#include <stdio.h>
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
-void Cipher() {
+AES_Ctx* AES_Init(enum AES_KEY_SIZE key_size, uint32_t* key) {
+    AES_Ctx* ctx = (AES_Ctx*)malloc(sizeof(AES_Ctx));
+    ctx->key = (AES_Key*)malloc(sizeof(AES_Key));
+    ctx->key->size = key_size;
+    ctx->key->data = (uint32_t*)malloc(key_size * sizeof(uint32_t));
+    memcpy(ctx->key->data, key, key_size * sizeof(uint32_t));
 
+    ctx->roundKey = (AES_RoundKey*)malloc(sizeof(AES_RoundKey));
+    switch (key_size) {
+        case AES_KEY_128:
+            ctx->roundKey->rounds = 10;
+            break;
+        case AES_KEY_192:
+            ctx->roundKey->rounds = 12;
+            break;
+        case AES_KEY_256:
+            ctx->roundKey->rounds = 14;
+            break;
+        default:
+            perror("Invalid key size!");
+            exit(1);
+            break;
+    }
+    ctx->roundKey->size = 4 * (ctx->roundKey->rounds + 1);
+    ctx->roundKey->data = (uint32_t*)malloc(ctx->roundKey->size * sizeof(uint32_t));
+    ExpandKey(ctx->key, ctx->roundKey);
+    return ctx;
 }
 
 void ExpandKey(AES_Key* key, AES_RoundKey* rkey) {
@@ -33,7 +60,7 @@ void ExpandKey(AES_Key* key, AES_RoundKey* rkey) {
             printf("%08X\t", tmp);
         }
         else {
-            printf("\t\t\t\t");
+            printf("\t\t\t\t\t\t\t\t");
         }
         rkey->data[i] = rkey->data[i - key->size] ^ tmp;
         printf("%08X\t%08X\n", rkey->data[i - key->size], rkey->data[i]);
