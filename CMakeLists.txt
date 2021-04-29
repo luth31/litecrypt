@@ -30,6 +30,7 @@ add_library(litecrypt_static STATIC $<TARGET_OBJECTS:objlib>)
 # Add test executable
 add_executable(litecrypt_test ${CMAKE_SOURCE_DIR}/tests/main.c $<TARGET_OBJECTS:objlib>)
 target_include_directories(litecrypt_test PUBLIC include)
+target_include_directories(litecrypt_test PRIVATE src)
 
 # Set library version
 set_target_properties(litecrypt_shared PROPERTIES 
