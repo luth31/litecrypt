@@ -51,6 +51,10 @@ typedef struct {
     uint8_t rounds;
 } AES_RoundKey;
 
+typedef struct {
+    uint32_t word[4];
+} AES_State;
+
 void Cipher();
 void ExpandKey(AES_Key* key, AES_RoundKey* rkey);
 void AddRoundKey();

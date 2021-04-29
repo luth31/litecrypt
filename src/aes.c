@@ -74,12 +74,34 @@ void MixColumns() {
 
 }
 
-void ShiftRows() {
-
+void ShiftRows(AES_State* state) {
+    uint32_t tmp;
+    // Second row
+    tmp = state->word[3] & 0x00FF0000;
+    state->word[3] = (state->word[3] & 0xFF00FFFF) | (state->word[0] & 0x00FF0000);
+    state->word[0] = (state->word[0] & 0xFF00FFFF) | (state->word[1] & 0x00FF0000);
+    state->word[1] = (state->word[1] & 0xFF00FFFF) | (state->word[2] & 0x00FF0000);
+    state->word[2] = (state->word[2] & 0xFF00FFFF) | (tmp);
+    // Third row
+    tmp = state->word[3] & 0x0000FF00;
+    state->word[3] = (state->word[3] & 0xFFFF00FF) | (state->word[1] & 0x0000FF00);
+    state->word[1] = (state->word[1] & 0xFFFF00FF) | tmp;
+    tmp = state->word[2] & 0x0000FF00;
+    state->word[2] = (state->word[2] & 0xFFFF00FF) | (state->word[0] & 0x0000FF00);
+    state->word[0] = (state->word[0] & 0xFFFF00FF) | tmp;
+    // Third row
+    tmp = state->word[3] & 0x000000FF;
+    state->word[3] = (state->word[3] & 0xFFFFFF00) | (state->word[2] & 0x000000FF);
+    state->word[2] = (state->word[2] & 0xFFFFFF00) | (state->word[1] & 0x000000FF);
+    state->word[1] = (state->word[1] & 0xFFFFFF00) | (state->word[0] & 0x000000FF);
+    state->word[0] = (state->word[0] & 0xFFFFFF00) | tmp;
 }
 
-void SubBytes() {
-
+void SubBytes(AES_State* state) {
+    SubWord(state->word[0]);
+    SubWord(state->word[1]);
+    SubWord(state->word[2]);
+    SubWord(state->word[3]);
 }
 
 void InvMixColumns() {
