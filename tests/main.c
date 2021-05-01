@@ -1,11 +1,9 @@
-#include "_aes.h"
-#include "stdio.h"
-#include "stdint.h"
-#include "_rot.h"
-#include <stdlib.h>
-#include <string.h>
-#include "aes.h"
 #include <assert.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include "_aes.h"
+#include "aes.h"
 
 // TODO: Add GoogleTest framework
 void test_key_schedule_128() {
@@ -41,9 +39,55 @@ void test_key_schedule_256() {
     printf("AES-256 key schedule test passed\n");
 }
 
+void test_encrypt_128() {
+    uint32_t input[4] = { 0x00112233, 0x44556677, 0x8899aabb, 0xccddeeff };
+    uint32_t key[4] = { 0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f };
+    uint32_t expected[4] = { 0x69c4e0d8, 0x6a7b0430, 0xd8cdb780, 0x70b4c55a };
+    uint32_t output[4];
+    AES_Ctx* ctx = AES_Init(AES_KEY_128, key);
+    AES_Encrypt(ctx, input, output);
+    for (int i = 0; i < 4; ++i) {
+        assert(output[i] == expected[i]);
+    }
+    printf("AES-128 encrypt test passed\n");
+}
+
+void test_encrypt_192() {
+    uint32_t input[4] = { 0x00112233, 0x44556677, 0x8899aabb, 0xccddeeff };
+    uint32_t key[6] = { 0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f, 0x10111213, 0x14151617 };
+    uint32_t expected[4] = { 0xdda97ca4, 0x864cdfe0, 0x6eaf70a0, 0xec0d7191 };
+    uint32_t output[4];
+    AES_Ctx* ctx = AES_Init(AES_KEY_192, key);
+    AES_Encrypt(ctx, input, output);
+    for (int i = 0; i < 4; ++i) {
+        assert(output[i] == expected[i]);
+    }
+    printf("AES-192 encrypt test passed\n");
+}
+
+void test_encrypt_256() {
+    uint32_t input[4] = { 0x00112233, 0x44556677, 0x8899aabb, 0xccddeeff };
+    uint32_t key[8] = { 0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f, 0x10111213, 0x14151617, 0x18191a1b, 0x1c1d1e1f };
+    uint32_t expected[4] = { 0x8ea2b7ca, 0x516745bf, 0xeafc4990, 0x4b496089 };
+    uint32_t output[4];
+    AES_Ctx* ctx = AES_Init(AES_KEY_256, key);
+    AES_Encrypt(ctx, input, output);
+    for (int i = 0; i < 4; ++i) {
+        assert(output[i] == expected[i]);
+    }
+    printf("AES-256 encrypt test passed\n");
+}
+
 int main(int argc, char** argv) {
+    // Test key schedule
     test_key_schedule_128();
     test_key_schedule_192();
     test_key_schedule_256();
+    
+    // Test encryption
+    test_encrypt_128();
+    test_encrypt_192();
+    test_encrypt_256();
+    
     return 0;
 }
