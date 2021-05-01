@@ -33,6 +33,16 @@ AES_Ctx* AES_Init(enum AES_KEY_SIZE key_size, uint32_t* key) {
     return ctx;
 }
 
+void AES_Encrypt(AES_Ctx* ctx, uint32_t input[4], uint32_t output[4]) {
+    AES_State* state = (AES_State*)malloc(sizeof(AES_State));
+    state->word[0] = input[0];
+    state->word[1] = input[1];
+    state->word[2] = input[2];
+    state->word[3] = input[3];
+    Cipher(state, ctx->roundKey);
+    memcpy(output, state->word, 4 * sizeof(uint32_t));
+}
+
 void ExpandKey(AES_Key* key, AES_RoundKey* rkey) {
     int i;
     for (i = 0; i < key->size; ++i) {
