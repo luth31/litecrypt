@@ -91,12 +91,12 @@ typedef struct {
     uint32_t word[4];
 } AES_State;
 
-void Cipher();
+void Cipher(AES_State* state, AES_RoundKey* key);
 void ExpandKey(AES_Key* key, AES_RoundKey* rkey);
-void AddRoundKey();
-void MixColumns();
-void ShiftRows();
-void SubBytes();
+void AddRoundKey(AES_State* state, AES_RoundKey* key, uint8_t round);
+void MixColumns(AES_State* state);
+void ShiftRows(AES_State* state);
+void SubBytes(AES_State* state);
 uint32_t SubWord(uint32_t word);
 uint32_t RotWord(uint32_t word);
 
