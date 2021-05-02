@@ -113,9 +113,6 @@ void MixColumns(AES_State* state) {
         col_copy[1] = state->word[i] >> 16;
         col_copy[2] = state->word[i] >> 8;
         col_copy[3] = state->word[i];
-        for (int j = 0; j < 4; ++j) {
-            //printf("%02x %02x %02x\n", col_copy[j], mixcol_mul_2[col_copy[j]], mixcol_mul_3[col_copy[j]]);
-        }
         col[0] = mixcol_mul_2[col_copy[0]] ^ mixcol_mul_3[col_copy[1]] ^ col_copy[2] ^ col_copy[3];
         col[1] = col_copy[0] ^ mixcol_mul_2[col_copy[1]] ^ mixcol_mul_3[col_copy[2]] ^ col_copy[3];
         col[2] = col_copy[0] ^ col_copy[1] ^ mixcol_mul_2[col_copy[2]] ^ mixcol_mul_3[col_copy[3]];
