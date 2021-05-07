@@ -40,6 +40,12 @@ void AES_Encrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]) {
             output[i + j * 4] = state.data[i][j];
 }
 
+void AES_Finish(AES_Ctx* ctx) {
+    free(ctx->key->state);
+    free(ctx->key);
+    free(ctx);
+}
+
 void ExpandKey(AES_Key* expanded_key, uint8_t rounds, uint32_t* key) {
     int i;
     uint32_t* rkey = (uint32_t*)malloc(4 * (rounds + 1) * sizeof(uint32_t));
