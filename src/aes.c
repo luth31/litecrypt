@@ -9,10 +9,6 @@ AES_Ctx* AES_Init(enum AES_KEY_SIZE key_size, uint32_t* key) {
     AES_Ctx* ctx = (AES_Ctx*)malloc(sizeof(AES_Ctx));
     ctx->key = (AES_Key*)malloc(sizeof(AES_Key));
     ctx->key->size = key_size;
-    ctx->key->data = (uint32_t*)malloc(key_size * sizeof(uint32_t));
-    memcpy(ctx->key->data, key, key_size * sizeof(uint32_t));
-
-    ctx->roundKey = (AES_RoundKey*)malloc(sizeof(AES_RoundKey));
     switch (key_size) {
         case AES_KEY_128:
             ctx->rounds = 10;
@@ -31,16 +27,6 @@ AES_Ctx* AES_Init(enum AES_KEY_SIZE key_size, uint32_t* key) {
     ctx->key->state = (AES_State*)malloc(sizeof(AES_State) * (ctx->rounds + 1));
     ExpandKey(ctx->key, ctx->rounds, key);
     return ctx;
-}
-
-void AES_Encrypt(AES_Ctx* ctx, uint32_t input[4], uint32_t output[4]) {
-    AES_State* state = (AES_State*)malloc(sizeof(AES_State));
-    state->word[0] = input[0];
-    state->word[1] = input[1];
-    state->word[2] = input[2];
-    state->word[3] = input[3];
-    Cipher(state, ctx->roundKey);
-    memcpy(output, state->word, 4 * sizeof(uint32_t));
 }
 
 void AES_Encrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]) {
@@ -86,14 +72,6 @@ uint32_t SubWord(uint32_t word) {
             (sbox[(word & 0x00FF0000) >> 16] << 16) |
             (sbox[(word & 0x0000FF00) >> 8] << 8) |
             (sbox[(word & 0x000000FF)]);
-    return word;
-}
-
-uint32_t RotWord(uint32_t word) {
-    word = ((word & 0xFF000000) >> 24) |
-            ((word & 0x00FF0000) << 8) |
-            ((word & 0x0000FF00) << 8) |
-            ((word & 0x000000FF) << 8);
     return word;
 }
 
