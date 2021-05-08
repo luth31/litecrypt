@@ -188,11 +188,3 @@ void SubBytes(AES_State* state) {
     state->data[3][2] = sbox[state->data[3][2]];
     state->data[3][3] = sbox[state->data[3][3]];
 }
-
-void InvShiftRows() {
-
-}
-
-void InvSubBytes() {
-
-}
