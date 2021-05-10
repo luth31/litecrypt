@@ -17,10 +17,12 @@ bool test_encrypt_128() {
     for (int i = 0; i < 4; ++i) {
         if (output[i] != expected[i]) {
             printf("AES-128 encrypt test failed\n");
+            AES_Finish(ctx);
             return false;
         }
     }
     printf("AES-128 encrypt test passed\n");
+    AES_Finish(ctx);
     return true;
 }
 
@@ -34,10 +36,12 @@ bool test_encrypt_192() {
     for (int i = 0; i < 4; ++i) {
         if (output[i] != expected[i]) {
             printf("AES-192 encrypt test failed\n");
+            AES_Finish(ctx);
             return false;
         }
     }
     printf("AES-192 encrypt test passed\n");
+    AES_Finish(ctx);
     return true;
 }
 
@@ -51,10 +55,12 @@ bool test_encrypt_256() {
     for (int i = 0; i < 4; ++i) {
         if (output[i] != expected[i]) {
             printf("AES-256 encrypt test failed\n");
+            AES_Finish(ctx);
             return false;
         }
     }
     printf("AES-256 encrypt test passed\n");
+    AES_Finish(ctx);
     return true;
 }
 
