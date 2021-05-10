@@ -163,20 +163,20 @@ typedef struct {
     uint8_t size;
 } AES_Key;
 
-void Cipher(AES_State* state, AES_Key* key, uint8_t rounds);
-void InvCipher(AES_State* state, AES_Key* key, uint8_t rounds);
+void FORCE_INLINE Cipher(AES_State* state, AES_Key* key, uint8_t rounds);
+void FORCE_INLINE InvCipher(AES_State* state, AES_Key* key, uint8_t rounds);
 
 void ExpandKey(AES_Key* expanded_key, uint8_t rounds, uint32_t* key);
-void AddRoundKey(AES_State* state, AES_Key* key, uint8_t round);
+void FORCE_INLINE AddRoundKey(AES_State* state, AES_Key* key, uint8_t round);
 
-void ShiftRows(AES_State* state);
-void InvShiftRows(AES_State* state);
+void FORCE_INLINE ShiftRows(AES_State* state);
+void FORCE_INLINE InvShiftRows(AES_State* state);
 
-void SubBytes(AES_State* state);
-void InvSubBytes(AES_State* state);
+void FORCE_INLINE SubBytes(AES_State* state);
+void FORCE_INLINE InvSubBytes(AES_State* state);
 
-void MixColumns(AES_State* state);
-void InvMixColumns(AES_State* state);
+void FORCE_INLINE MixColumns(AES_State* state);
+void FORCE_INLINE InvMixColumns(AES_State* state);
 
 uint32_t SubWord(uint32_t word);
 #endif
