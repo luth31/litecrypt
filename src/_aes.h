@@ -162,7 +162,13 @@ void ExpandKey(AES_Key* expanded_key, uint8_t rounds, uint32_t* key);
 void AddRoundKey(AES_State* state, AES_Key* key, uint8_t round);
 
 void ShiftRows(AES_State* state);
+void InvShiftRows(AES_State* state);
+
 void SubBytes(AES_State* state);
+void InvSubBytes(AES_State* state);
+
 void MixColumns(AES_State* state);
+void InvMixColumns(AES_State* state);
+
 uint32_t SubWord(uint32_t word);
 #endif

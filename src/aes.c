@@ -244,6 +244,29 @@ void ShiftRows(AES_State* state) {
     state->data[3][0] = tmp;
 }
 
+void InvShiftRows(AES_State* state) {
+    uint32_t tmp;
+    // Second row
+    tmp = state->data[1][0];
+    state->data[1][0] = state->data[1][3];
+    state->data[1][3] = state->data[1][2];
+    state->data[1][2] = state->data[1][1];
+    state->data[1][1] = tmp;
+    // Third row
+    tmp = state->data[2][0];
+    state->data[2][0] = state->data[2][2];
+    state->data[2][2] = tmp;
+    tmp = state->data[2][1];
+    state->data[2][1] = state->data[2][3];
+    state->data[2][3] = tmp;
+    // Fourth row
+    tmp = state->data[3][0];
+    state->data[3][0] = state->data[3][1];
+    state->data[3][1] = state->data[3][2];
+    state->data[3][2] = state->data[3][3];
+    state->data[3][3] = tmp;
+}
+
 void SubBytes(AES_State* state) {
     state->data[0][0] = sbox[state->data[0][0]];
     state->data[0][1] = sbox[state->data[0][1]];
@@ -264,6 +287,28 @@ void SubBytes(AES_State* state) {
     state->data[3][1] = sbox[state->data[3][1]];
     state->data[3][2] = sbox[state->data[3][2]];
     state->data[3][3] = sbox[state->data[3][3]];
+}
+
+void InvSubBytes(AES_State* state) {
+    state->data[0][0] = sbox_inv[state->data[0][0]];
+    state->data[0][1] = sbox_inv[state->data[0][1]];
+    state->data[0][2] = sbox_inv[state->data[0][2]];
+    state->data[0][3] = sbox_inv[state->data[0][3]];
+
+    state->data[1][0] = sbox_inv[state->data[1][0]];
+    state->data[1][1] = sbox_inv[state->data[1][1]];
+    state->data[1][2] = sbox_inv[state->data[1][2]];
+    state->data[1][3] = sbox_inv[state->data[1][3]];
+
+    state->data[2][0] = sbox_inv[state->data[2][0]];
+    state->data[2][1] = sbox_inv[state->data[2][1]];
+    state->data[2][2] = sbox_inv[state->data[2][2]];
+    state->data[2][3] = sbox_inv[state->data[2][3]];
+
+    state->data[3][0] = sbox_inv[state->data[3][0]];
+    state->data[3][1] = sbox_inv[state->data[3][1]];
+    state->data[3][2] = sbox_inv[state->data[3][2]];
+    state->data[3][3] = sbox_inv[state->data[3][3]];
 }
 
 void MixColumns(AES_State* state) {
@@ -288,6 +333,31 @@ void MixColumns(AES_State* state) {
     tmp[1][3] = state->data[0][3] ^ mixcol_mul_2[state->data[1][3]] ^ mixcol_mul_3[state->data[2][3]] ^ state->data[3][3];
     tmp[2][3] = state->data[0][3] ^ state->data[1][3] ^ mixcol_mul_2[state->data[2][3]] ^ mixcol_mul_3[state->data[3][3]];
     tmp[3][3] = mixcol_mul_3[state->data[0][3]] ^ state->data[1][3] ^ state->data[2][3] ^ mixcol_mul_2[state->data[3][3]];
+    memcpy(state->data, tmp, 16);
+}
+
+void InvMixColumns(AES_State* state) {
+    uint8_t tmp[4][4];
+    // First column
+    tmp[0][0] = mixcol_mul_14[state->data[0][0]] ^ mixcol_mul_11[state->data[1][0]] ^ mixcol_mul_13[state->data[2][0]] ^ mixcol_mul_9[state->data[3][0]];
+    tmp[1][0] = mixcol_mul_9[state->data[0][0]] ^ mixcol_mul_14[state->data[1][0]] ^ mixcol_mul_11[state->data[2][0]] ^ mixcol_mul_13[state->data[3][0]];
+    tmp[2][0] = mixcol_mul_13[state->data[0][0]] ^ mixcol_mul_9[state->data[1][0]] ^ mixcol_mul_14[state->data[2][0]] ^ mixcol_mul_11[state->data[3][0]];
+    tmp[3][0] = mixcol_mul_11[state->data[0][0]] ^ mixcol_mul_13[state->data[1][0]] ^ mixcol_mul_9[state->data[2][0]] ^ mixcol_mul_14[state->data[3][0]];
+    // Second column
+    tmp[0][1] = mixcol_mul_14[state->data[0][1]] ^ mixcol_mul_11[state->data[1][1]] ^ mixcol_mul_13[state->data[2][1]] ^ mixcol_mul_9[state->data[3][1]];
+    tmp[1][1] = mixcol_mul_9[state->data[0][1]] ^ mixcol_mul_14[state->data[1][1]] ^ mixcol_mul_11[state->data[2][1]] ^ mixcol_mul_13[state->data[3][1]];
+    tmp[2][1] = mixcol_mul_13[state->data[0][1]] ^ mixcol_mul_9[state->data[1][1]] ^ mixcol_mul_14[state->data[2][1]] ^ mixcol_mul_11[state->data[3][1]];
+    tmp[3][1] = mixcol_mul_11[state->data[0][1]] ^ mixcol_mul_13[state->data[1][1]] ^ mixcol_mul_9[state->data[2][1]] ^ mixcol_mul_14[state->data[3][1]];
+    // Third column
+    tmp[0][2] = mixcol_mul_14[state->data[0][2]] ^ mixcol_mul_11[state->data[1][2]] ^ mixcol_mul_13[state->data[2][2]] ^ mixcol_mul_9[state->data[3][2]];
+    tmp[1][2] = mixcol_mul_9[state->data[0][2]] ^ mixcol_mul_14[state->data[1][2]] ^ mixcol_mul_11[state->data[2][2]] ^ mixcol_mul_13[state->data[3][2]];
+    tmp[2][2] = mixcol_mul_13[state->data[0][2]] ^ mixcol_mul_9[state->data[1][2]] ^ mixcol_mul_14[state->data[2][2]] ^ mixcol_mul_11[state->data[3][2]];
+    tmp[3][2] = mixcol_mul_11[state->data[0][2]] ^ mixcol_mul_13[state->data[1][2]] ^ mixcol_mul_9[state->data[2][2]] ^ mixcol_mul_14[state->data[3][2]];
+    // Fourth column
+    tmp[0][3] = mixcol_mul_14[state->data[0][3]] ^ mixcol_mul_11[state->data[1][3]] ^ mixcol_mul_13[state->data[2][3]] ^ mixcol_mul_9[state->data[3][3]];
+    tmp[1][3] = mixcol_mul_9[state->data[0][3]] ^ mixcol_mul_14[state->data[1][3]] ^ mixcol_mul_11[state->data[2][3]] ^ mixcol_mul_13[state->data[3][3]];
+    tmp[2][3] = mixcol_mul_13[state->data[0][3]] ^ mixcol_mul_9[state->data[1][3]] ^ mixcol_mul_14[state->data[2][3]] ^ mixcol_mul_11[state->data[3][3]];
+    tmp[3][3] = mixcol_mul_11[state->data[0][3]] ^ mixcol_mul_13[state->data[1][3]] ^ mixcol_mul_9[state->data[2][3]] ^ mixcol_mul_14[state->data[3][3]];
     memcpy(state->data, tmp, 16);
 }
 
