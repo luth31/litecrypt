@@ -40,6 +40,17 @@ void AES_Encrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]) {
             output[i + j * 4] = state.data[i][j];
 }
 
+void AES_Decrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]) {
+    AES_State state;
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j)
+            state.data[i][j] = input[i + j * 4];
+    InvCipher(&state, ctx->key, ctx->rounds);
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j)
+            output[i + j * 4] = state.data[i][j];
+}
+
 void AES_Finish(AES_Ctx* ctx) {
     free(ctx->key->state);
     free(ctx->key);

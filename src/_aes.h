@@ -158,6 +158,8 @@ typedef struct {
 } AES_Key;
 
 void Cipher(AES_State* state, AES_Key* key, uint8_t rounds);
+void InvCipher(AES_State* state, AES_Key* key, uint8_t rounds);
+
 void ExpandKey(AES_Key* expanded_key, uint8_t rounds, uint32_t* key);
 void AddRoundKey(AES_State* state, AES_Key* key, uint8_t round);
 
