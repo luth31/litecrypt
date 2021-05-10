@@ -64,12 +64,74 @@ bool test_encrypt_256() {
     return true;
 }
 
+bool test_decrypt_128() {
+    uint8_t input[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+    uint32_t key[4] = { 0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f };
+    uint8_t output[16];
+    AES_Ctx* ctx = AES_Init(AES_KEY_128, key);
+    AES_Encrypt(ctx, input, output);
+    AES_Decrypt(ctx, output, output);
+    for (int i = 0; i < 4; ++i) {
+        if (output[i] != input[i]) {
+            printf("AES-128 decrypt test failed\n");
+            AES_Finish(ctx);
+            return false;
+        }
+    }
+    printf("AES-128 decrypt test passed\n");
+    AES_Finish(ctx);
+    return true;
+}
+
+bool test_decrypt_192() {
+    uint8_t input[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+    uint32_t key[6] = { 0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f, 0x10111213, 0x14151617 };
+    uint8_t output[16];
+    AES_Ctx* ctx = AES_Init(AES_KEY_192, key);
+    AES_Encrypt(ctx, input, output);
+    AES_Decrypt(ctx, output, output);
+    for (int i = 0; i < 4; ++i) {
+        if (output[i] != input[i]) {
+            printf("AES-192 decrypt test failed\n");
+            AES_Finish(ctx);
+            return false;
+        }
+    }
+    printf("AES-192 decrypt test passed\n");
+    AES_Finish(ctx);
+    return true;
+}
+
+bool test_decrypt_256() {
+    uint8_t input[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+    uint32_t key[8] = { 0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f, 0x10111213, 0x14151617, 0x18191a1b, 0x1c1d1e1f };
+    uint8_t output[16];
+    AES_Ctx* ctx = AES_Init(AES_KEY_256, key);
+    AES_Encrypt(ctx, input, output);
+    AES_Decrypt(ctx, output, output);
+    for (int i = 0; i < 4; ++i) {
+        if (output[i] != input[i]) {
+            printf("AES-256 decrypt test failed\n");
+            AES_Finish(ctx);
+            return false;
+        }
+    }
+    printf("AES-256 decrypt test passed\n");
+    AES_Finish(ctx);
+    return true;
+}
+
 int main(int argc, char** argv) {
     bool passed = true;
     // Test encryption
     passed = test_encrypt_128();
     passed = test_encrypt_192();
     passed = test_encrypt_256();
+    
+    passed = test_decrypt_128();
+    passed = test_decrypt_192();
+    passed = test_decrypt_256();
+
     if (!passed)
         return 1;
     return 0;
