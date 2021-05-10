@@ -46,6 +46,132 @@ void AES_Finish(AES_Ctx* ctx) {
     free(ctx);
 }
 
+void Cipher(AES_State* state, AES_Key* key, uint8_t rounds) {
+    AddRoundKey(state, key, 0);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 1);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 2);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 3);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 4);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 5);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 6);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 7);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 8);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, key, 9);
+    if (key->size > AES_KEY_128) {
+        SubBytes(state);
+        ShiftRows(state);
+        MixColumns(state);
+        AddRoundKey(state, key, 10);
+        SubBytes(state);
+        ShiftRows(state);
+        MixColumns(state);
+        AddRoundKey(state, key, 11);
+        if (key->size > AES_KEY_192) {
+            SubBytes(state);
+            ShiftRows(state);
+            MixColumns(state);
+            AddRoundKey(state, key, 12);
+            SubBytes(state);
+            ShiftRows(state);
+            MixColumns(state);
+            AddRoundKey(state, key, 13);
+        }
+    }
+    SubBytes(state);
+    ShiftRows(state);
+    AddRoundKey(state, key, rounds);
+}
+
+void InvCipher(AES_State* state, AES_Key* key, uint8_t rounds) {
+    AddRoundKey(state, key, rounds);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 1);
+    InvMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 2);
+    InvMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 3);
+    InvMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 4);
+    InvMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 5);
+    InvMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 6);
+    InvMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 7);
+    InvMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 8);
+    InvMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, rounds - 9);
+    InvMixColumns(state);
+    if (key->size > AES_KEY_128) {
+        InvShiftRows(state);
+        InvSubBytes(state);
+        AddRoundKey(state, key, rounds - 10);
+        InvMixColumns(state);
+        InvShiftRows(state);
+        InvSubBytes(state);
+        AddRoundKey(state, key, rounds - 11);
+        InvMixColumns(state);
+        if (key->size > AES_KEY_192) {
+            InvShiftRows(state);
+            InvSubBytes(state);
+            AddRoundKey(state, key, rounds - 12);
+            InvMixColumns(state);
+            InvShiftRows(state);
+            InvSubBytes(state);
+            AddRoundKey(state, key, rounds - 13);
+            InvMixColumns(state);
+        }
+    }
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, key, 0);
+}
+
 void ExpandKey(AES_Key* expanded_key, uint8_t rounds, uint32_t* key) {
     int i;
     uint32_t* rkey = (uint32_t*)malloc(4 * (rounds + 1) * sizeof(uint32_t));
@@ -73,30 +199,6 @@ void ExpandKey(AES_Key* expanded_key, uint8_t rounds, uint32_t* key) {
     free(rkey);
 }
 
-uint32_t SubWord(uint32_t word) {
-    word = (sbox[(word & 0xFF000000) >> 24] << 24) |
-            (sbox[(word & 0x00FF0000) >> 16] << 16) |
-            (sbox[(word & 0x0000FF00) >> 8] << 8) |
-            (sbox[(word & 0x000000FF)]);
-    return word;
-}
-
-void Cipher(AES_State* state, AES_Key* key, uint8_t rounds) {
-    AES_State temp_state;
-    memcpy(temp_state.data, state->data, sizeof(AES_State));
-    AddRoundKey(&temp_state, key, 0);
-    for (int i = 1; i < rounds; ++i) {
-        SubBytes(&temp_state);
-        ShiftRows(&temp_state);
-        MixColumns(&temp_state);
-        AddRoundKey(&temp_state, key, i);
-    }
-    SubBytes(&temp_state);
-    ShiftRows(&temp_state);
-    AddRoundKey(&temp_state, key, rounds);
-    memcpy(state->data, temp_state.data, 16);
-}
-
 void AddRoundKey(AES_State* state, AES_Key* key, uint8_t round) {
     state->data[0][0] ^= key->state[round].data[0][0];
     state->data[0][1] ^= key->state[round].data[0][1];
@@ -117,31 +219,6 @@ void AddRoundKey(AES_State* state, AES_Key* key, uint8_t round) {
     state->data[3][1] ^= key->state[round].data[3][1];
     state->data[3][2] ^= key->state[round].data[3][2];
     state->data[3][3] ^= key->state[round].data[3][3];
-}
-
-void MixColumns(AES_State* state) {
-    uint8_t tmp[4][4];
-    // First column
-    tmp[0][0] = mixcol_mul_2[state->data[0][0]] ^ mixcol_mul_3[state->data[1][0]] ^ state->data[2][0] ^ state->data[3][0];
-    tmp[1][0] = state->data[0][0] ^ mixcol_mul_2[state->data[1][0]] ^ mixcol_mul_3[state->data[2][0]] ^ state->data[3][0];
-    tmp[2][0] = state->data[0][0] ^ state->data[1][0] ^ mixcol_mul_2[state->data[2][0]] ^ mixcol_mul_3[state->data[3][0]];
-    tmp[3][0] = mixcol_mul_3[state->data[0][0]] ^ state->data[1][0] ^ state->data[2][0] ^ mixcol_mul_2[state->data[3][0]];
-    // Second column
-    tmp[0][1] = mixcol_mul_2[state->data[0][1]] ^ mixcol_mul_3[state->data[1][1]] ^ state->data[2][1] ^ state->data[3][1];
-    tmp[1][1] = state->data[0][1] ^ mixcol_mul_2[state->data[1][1]] ^ mixcol_mul_3[state->data[2][1]] ^ state->data[3][1];
-    tmp[2][1] = state->data[0][1] ^ state->data[1][1] ^ mixcol_mul_2[state->data[2][1]] ^ mixcol_mul_3[state->data[3][1]];
-    tmp[3][1] = mixcol_mul_3[state->data[0][1]] ^ state->data[1][1] ^ state->data[2][1] ^ mixcol_mul_2[state->data[3][1]];
-    // Third column
-    tmp[0][2] = mixcol_mul_2[state->data[0][2]] ^ mixcol_mul_3[state->data[1][2]] ^ state->data[2][2] ^ state->data[3][2];
-    tmp[1][2] = state->data[0][2] ^ mixcol_mul_2[state->data[1][2]] ^ mixcol_mul_3[state->data[2][2]] ^ state->data[3][2];
-    tmp[2][2] = state->data[0][2] ^ state->data[1][2] ^ mixcol_mul_2[state->data[2][2]] ^ mixcol_mul_3[state->data[3][2]];
-    tmp[3][2] = mixcol_mul_3[state->data[0][2]] ^ state->data[1][2] ^ state->data[2][2] ^ mixcol_mul_2[state->data[3][2]];
-    // Fourth column
-    tmp[0][3] = mixcol_mul_2[state->data[0][3]] ^ mixcol_mul_3[state->data[1][3]] ^ state->data[2][3] ^ state->data[3][3];
-    tmp[1][3] = state->data[0][3] ^ mixcol_mul_2[state->data[1][3]] ^ mixcol_mul_3[state->data[2][3]] ^ state->data[3][3];
-    tmp[2][3] = state->data[0][3] ^ state->data[1][3] ^ mixcol_mul_2[state->data[2][3]] ^ mixcol_mul_3[state->data[3][3]];
-    tmp[3][3] = mixcol_mul_3[state->data[0][3]] ^ state->data[1][3] ^ state->data[2][3] ^ mixcol_mul_2[state->data[3][3]];
-    memcpy(state->data, tmp, 16);
 }
 
 void ShiftRows(AES_State* state) {
@@ -187,4 +264,37 @@ void SubBytes(AES_State* state) {
     state->data[3][1] = sbox[state->data[3][1]];
     state->data[3][2] = sbox[state->data[3][2]];
     state->data[3][3] = sbox[state->data[3][3]];
+}
+
+void MixColumns(AES_State* state) {
+    uint8_t tmp[4][4];
+    // First column
+    tmp[0][0] = mixcol_mul_2[state->data[0][0]] ^ mixcol_mul_3[state->data[1][0]] ^ state->data[2][0] ^ state->data[3][0];
+    tmp[1][0] = state->data[0][0] ^ mixcol_mul_2[state->data[1][0]] ^ mixcol_mul_3[state->data[2][0]] ^ state->data[3][0];
+    tmp[2][0] = state->data[0][0] ^ state->data[1][0] ^ mixcol_mul_2[state->data[2][0]] ^ mixcol_mul_3[state->data[3][0]];
+    tmp[3][0] = mixcol_mul_3[state->data[0][0]] ^ state->data[1][0] ^ state->data[2][0] ^ mixcol_mul_2[state->data[3][0]];
+    // Second column
+    tmp[0][1] = mixcol_mul_2[state->data[0][1]] ^ mixcol_mul_3[state->data[1][1]] ^ state->data[2][1] ^ state->data[3][1];
+    tmp[1][1] = state->data[0][1] ^ mixcol_mul_2[state->data[1][1]] ^ mixcol_mul_3[state->data[2][1]] ^ state->data[3][1];
+    tmp[2][1] = state->data[0][1] ^ state->data[1][1] ^ mixcol_mul_2[state->data[2][1]] ^ mixcol_mul_3[state->data[3][1]];
+    tmp[3][1] = mixcol_mul_3[state->data[0][1]] ^ state->data[1][1] ^ state->data[2][1] ^ mixcol_mul_2[state->data[3][1]];
+    // Third column
+    tmp[0][2] = mixcol_mul_2[state->data[0][2]] ^ mixcol_mul_3[state->data[1][2]] ^ state->data[2][2] ^ state->data[3][2];
+    tmp[1][2] = state->data[0][2] ^ mixcol_mul_2[state->data[1][2]] ^ mixcol_mul_3[state->data[2][2]] ^ state->data[3][2];
+    tmp[2][2] = state->data[0][2] ^ state->data[1][2] ^ mixcol_mul_2[state->data[2][2]] ^ mixcol_mul_3[state->data[3][2]];
+    tmp[3][2] = mixcol_mul_3[state->data[0][2]] ^ state->data[1][2] ^ state->data[2][2] ^ mixcol_mul_2[state->data[3][2]];
+    // Fourth column
+    tmp[0][3] = mixcol_mul_2[state->data[0][3]] ^ mixcol_mul_3[state->data[1][3]] ^ state->data[2][3] ^ state->data[3][3];
+    tmp[1][3] = state->data[0][3] ^ mixcol_mul_2[state->data[1][3]] ^ mixcol_mul_3[state->data[2][3]] ^ state->data[3][3];
+    tmp[2][3] = state->data[0][3] ^ state->data[1][3] ^ mixcol_mul_2[state->data[2][3]] ^ mixcol_mul_3[state->data[3][3]];
+    tmp[3][3] = mixcol_mul_3[state->data[0][3]] ^ state->data[1][3] ^ state->data[2][3] ^ mixcol_mul_2[state->data[3][3]];
+    memcpy(state->data, tmp, 16);
+}
+
+uint32_t SubWord(uint32_t word) {
+    word = (sbox[(word & 0xFF000000) >> 24] << 24) |
+            (sbox[(word & 0x00FF0000) >> 16] << 16) |
+            (sbox[(word & 0x0000FF00) >> 8] << 8) |
+            (sbox[(word & 0x000000FF)]);
+    return word;
 }
