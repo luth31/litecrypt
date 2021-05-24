@@ -32,6 +32,8 @@ add_executable(litecrypt_test ${CMAKE_SOURCE_DIR}/tests/main.c $<TARGET_OBJECTS:
 target_include_directories(litecrypt_test PUBLIC include)
 target_include_directories(litecrypt_test PRIVATE src)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+
 # Set library version
 set_target_properties(litecrypt_shared PROPERTIES 
     VERSION ${PROJECT_VERSION}

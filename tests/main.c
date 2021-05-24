@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include "_aes.h"
 #include "aes.h"
+#include <pthread.h>
+#include <string.h>
 
 // TODO: Add GoogleTest framework
 bool test_encrypt_128() {
@@ -121,17 +123,106 @@ bool test_decrypt_256() {
     return true;
 }
 
+typedef struct {
+    AES_Ctx* ctx;
+    uint8_t* data;
+} AES_MT_ENC_DATA;
+
+void* parallel_encrypt_file(void* data) {
+    uint64_t size;
+    AES_MT_ENC_DATA* mt_data = (AES_MT_ENC_DATA*)data;
+    uint8_t* enc_data = AES_Encrypt_MT(mt_data->ctx, mt_data->data, 128, &size);
+    return (void*)enc_data;
+}
+
+void encrypt_file(int argc, char** argv) {
+    FILE* test_file = fopen(argv[2], "r");
+    char enc_filename[128];
+    strcpy(enc_filename, argv[2]);
+    strcat(enc_filename, ".aes");
+
+    if (test_file == NULL) {
+        printf("Couldn't open file!\n");
+        return;
+    }
+    FILE* encrypted_file = fopen(enc_filename, "w+");
+    if (encrypted_file == NULL) {
+        printf("Couldn't create encrypted file!\n");
+        return;
+    }
+    fseek(test_file, 0, SEEK_END);
+    size_t size = ftell(test_file);
+    fseek(test_file, 0, SEEK_SET);
+    
+    uint32_t key[4] = { 0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f };
+    AES_Ctx* ctx = AES_Init(AES_KEY_128, key);
+
+    pthread_t threads[4];
+    AES_MT_ENC_DATA* mt_data = (AES_MT_ENC_DATA*)malloc(4 * sizeof(AES_MT_ENC_DATA));
+
+    uint8_t* buffer = (uint8_t*)malloc(512 * sizeof(uint8_t));
+
+    for (int i = 0; i < 4; ++i) {
+        mt_data[i].ctx = ctx;
+        mt_data[i].data = buffer + (128 * i);
+    }
+
+    uint64_t read_size;
+    while ((read_size = fread(buffer, sizeof(uint8_t), 512, test_file)) > 0) {
+        if (read_size < 512) {
+            uint64_t enc_size;
+            uint8_t* enc_buffer = AES_Encrypt_MT(ctx, buffer, read_size, &enc_size);
+            fwrite(enc_buffer, enc_size, 1, encrypted_file);
+            free(enc_buffer);
+        }
+        else {
+            uint8_t* enc_buffer[4];
+
+            pthread_create(&threads[0], NULL, parallel_encrypt_file, &mt_data[0]);
+            pthread_create(&threads[1], NULL, parallel_encrypt_file, &mt_data[1]);
+            pthread_create(&threads[2], NULL, parallel_encrypt_file, &mt_data[2]);
+            pthread_create(&threads[3], NULL, parallel_encrypt_file, &mt_data[3]);
+
+            pthread_join(threads[0], &enc_buffer[0]);
+            pthread_join(threads[1], &enc_buffer[1]);
+            pthread_join(threads[2], &enc_buffer[2]);
+            pthread_join(threads[3], &enc_buffer[3]);
+            for (int i = 0; i < 4; ++i) {
+                fwrite(enc_buffer[i], 128, 1, encrypted_file);
+                free(enc_buffer[i]);
+            }
+        }
+    }
+    free(mt_data);
+    free(buffer);
+    fclose(test_file);
+    fclose(encrypted_file);
+    AES_Finish(ctx);
+}
+
 int main(int argc, char** argv) {
     bool passed = true;
     // Test encryption
-    passed = test_encrypt_128();
+    /*passed = test_encrypt_128();
     passed = test_encrypt_192();
     passed = test_encrypt_256();
     
     passed = test_decrypt_128();
     passed = test_decrypt_192();
-    passed = test_decrypt_256();
-
+    passed = test_decrypt_256();*/
+    if (argc < 2) {
+        printf("Not enough arguments!\n");
+        return 1;
+    }
+    if (strcmp(argv[1], "-e") == 0)
+        encrypt_file(argc, argv);
+    else if (strcmp(argv[1], "-d") == 0)
+        //decrypt_file(argc, argv);
+        printf("Decryption not yet implemented!\n");
+    else {
+        printf("Invalid operation!\n");
+        return 1;
+    }
     if (!passed)
         return 1;
     return 0;

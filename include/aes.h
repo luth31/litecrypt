@@ -15,7 +15,7 @@ enum AES_KEY_SIZE {
 };
 
 AES_Ctx* AES_Init(enum AES_KEY_SIZE key_size, uint32_t* key);
-void AES_Encrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]);
-void AES_Decrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]);
+uint8_t* AES_Encrypt(AES_Ctx* ctx, uint8_t* data, uint64_t size, uint64_t* size_encrypted);
+uint8_t* AES_Decrypt(AES_Ctx*, uint8_t* data, uint64_t size);
 void AES_Finish(AES_Ctx* ctx);
 #endif

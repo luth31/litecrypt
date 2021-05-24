@@ -29,26 +29,59 @@ AES_Ctx* AES_Init(enum AES_KEY_SIZE key_size, uint32_t* key) {
     return ctx;
 }
 
-void AES_Encrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]) {
+void Encrypt(AES_Key* key, uint8_t rounds, uint8_t input[16], uint8_t output[16]) {
     AES_State state;
     for (int i = 0; i < 4; ++i)
         for (int j = 0; j < 4; ++j)
             state.data[i][j] = input[i + j * 4];
-    Cipher(&state, ctx->key, ctx->rounds);
+    Cipher(&state, key, rounds);
     for (int i = 0; i < 4; ++i)
         for (int j = 0; j < 4; ++j)
             output[i + j * 4] = state.data[i][j];
 }
 
-void AES_Decrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]) {
+uint8_t* AES_Encrypt(AES_Ctx* ctx, uint8_t* data, uint64_t size, uint64_t* size_encrypted) {
+    uint8_t* encrypted = (uint8_t*)malloc((size + (16 - size % 16)) * sizeof(uint8_t));
+    uint64_t parsed = 0;
+    uint64_t size_no_remain = size - (size % 16);
+    (*size_encrypted) = size;
+    while (parsed < size_no_remain) {
+        Encrypt(ctx->key, ctx->rounds, data + parsed, encrypted + parsed);
+        parsed += 16;
+    }
+    if (size > size_no_remain) {
+        uint8_t padded[16];
+        int i = 0;
+        for (; i < size - size_no_remain; ++i)
+            padded[i] = data[size_no_remain + i];
+        padded[i++] = 0x80;
+        while (i < 16)
+            padded[i++] = 0;
+        Encrypt(ctx->key, ctx->rounds, padded, encrypted + parsed);
+        (*size_encrypted) = size_no_remain + 16;
+    }
+    return encrypted;
+}
+
+void Decrypt(AES_Key* key, uint8_t rounds, uint8_t input[16], uint8_t output[16]) {
     AES_State state;
     for (int i = 0; i < 4; ++i)
         for (int j = 0; j < 4; ++j)
             state.data[i][j] = input[i + j * 4];
-    InvCipher(&state, ctx->key, ctx->rounds);
+    InvCipher(&state, key, rounds);
     for (int i = 0; i < 4; ++i)
         for (int j = 0; j < 4; ++j)
             output[i + j * 4] = state.data[i][j];
+}
+
+uint8_t* AES_Decrypt(AES_Ctx* ctx, uint8_t* data, uint64_t size) {
+    uint8_t* decrypted = (uint8_t*)malloc(size * sizeof(uint8_t));
+    uint64_t parsed = 0;
+    while (parsed < size) {
+        Decrypt(ctx->key, ctx->rounds, data + parsed, decrypted + parsed);
+        parsed += 16;
+    }
+    return decrypted;
 }
 
 void AES_Finish(AES_Ctx* ctx) {
