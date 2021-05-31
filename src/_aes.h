@@ -163,8 +163,8 @@ typedef struct {
     uint8_t size;
 } AES_Key;
 
-void Encrypt(AES_Key* key, uint8_t rounds, uint8_t input[16], uint8_t output[16]);
-void Decrypt(AES_Key* key, uint8_t rounds, uint8_t input[16], uint8_t output[16]);
+static void FORCE_INLINE Encrypt(AES_Key* key, uint8_t rounds, uint8_t input[16], uint8_t output[16]);
+static void FORCE_INLINE Decrypt(AES_Key* key, uint8_t rounds, uint8_t input[16], uint8_t output[16]);
 
 static void FORCE_INLINE Cipher(AES_State* state, AES_Key* key, uint8_t rounds);
 static void FORCE_INLINE InvCipher(AES_State* state, AES_Key* key, uint8_t rounds);
