@@ -8,6 +8,12 @@ typedef struct {
     uint8_t rounds;
 } AES_Ctx;
 
+typedef struct {
+    AES_Ctx aes;
+    uint64_t nonce;
+    uint64_t counter;
+} AES_CTR_Ctx;
+
 enum AES_KEY_SIZE {
     AES_KEY_128 = 4,
     AES_KEY_192 = 6,

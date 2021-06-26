@@ -132,6 +132,7 @@ int main(int argc, char** argv) {
     passed = test_decrypt_192();
     passed = test_decrypt_256();
 
+    test_ctr();
     if (!passed)
         return 1;
     return 0;

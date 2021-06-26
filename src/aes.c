@@ -29,6 +29,40 @@ AES_Ctx* AES_Init(enum AES_KEY_SIZE key_size, uint32_t* key) {
     return ctx;
 }
 
+AES_CTR_Ctx* AES_CTR_Init(enum AES_KEY_SIZE key_size, uint32_t* key, uint64_t nonce) {
+    AES_CTR_Ctx* ctx = (AES_CTR_Ctx*)malloc(sizeof(AES_CTR_Ctx));
+    ctx->aes.key = (AES_Key*)malloc(sizeof(AES_Key));
+    ctx->aes.key->size = key_size;
+        switch (key_size) {
+        case AES_KEY_128:
+            ctx->aes.rounds = 10;
+            break;
+        case AES_KEY_192:
+            ctx->aes.rounds = 12;
+            break;
+        case AES_KEY_256:
+            ctx->aes.rounds = 14;
+            break;
+        default:
+            perror("Invalid key size!");
+            exit(1);
+            break;
+    }
+    ctx->aes.key->state = (AES_State*)malloc(sizeof(AES_State) * (ctx->aes.rounds + 1));
+    ExpandKey(ctx->aes.key, ctx->aes.rounds, key);
+    ctx->nonce = nonce;
+    ctx->counter = 0;
+    return ctx;
+}
+
+void AES_GenCtrBlock(AES_CTR_Ctx* ctx, uint8_t output[16]) {
+    uint8_t data[16];
+    memcpy(data, &ctx->nonce, 8);
+    memcpy(data+8, &ctx->counter, 8);
+    AES_Encrypt(&ctx->aes, data, output);
+    ctx->nonce += 1;
+}
+
 void AES_Encrypt(AES_Ctx* ctx, uint8_t input[16], uint8_t output[16]) {
     AES_State state;
     for (int i = 0; i < 4; ++i)
