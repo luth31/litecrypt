@@ -6,10 +6,13 @@ on:
     branches: [ master, dev ]
 jobs:
   build:
+    name: Build and test
+
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest]
+
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -43,3 +46,38 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: ./litecrypt_test.exe
         working-directory: build\Debug
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ matrix.os }}-${{ github.refname }}
+          path: build
+          retention-days: 8
+  analyze:
+    name: Analyze codebase using CodeQL
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['c', 'cpp']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifacts
+        with:
+          name: build-ubuntu-latest-${{ github.refname }}
+
+      - name: Init CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+        
+      
+        
