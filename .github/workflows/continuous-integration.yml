@@ -1,24 +1,31 @@
 name: ci
 on:
   push:
-    branches:
-      - master
+    branches: [ master, dev ]
   pull_request:
-    branches:
-      - master
+    branches: [ master, dev ]
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Create build directory
-        run: mkdir $GITHUB_WORKSPACE/build
+        run: mkdir build
       - name: Run CMake
         run: cmake ../
-        working-directory: ${{ github.workspace	}}/build
-      - name: Make targets
+        working-directory: ./build
+      - name: Build targets
+        if: ${{ matrix.os != 'windows-latest' }}
         run: make -j$(nproc)
-        working-directory: ${{ github.workspace	}}/build
+        working-directory: ./build
+      - name: Build targets
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: MSBuild.exe litecrypt.sln
+        working-directory: ./build
       - name: Test
         run: ./litecrypt_test
-        working-directory: ${{ github.workspace	}}/build
+        working-directory: ./build
