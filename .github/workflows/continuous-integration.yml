@@ -31,7 +31,7 @@ jobs:
 
       - name: Build targets
         if: ${{ matrix.os == 'windows-latest' }}
-        run: MSBuild.exe litecrypt.sln
+        run: MSBuild.exe -m litecrypt.sln
         working-directory: ./build
 
       - name: Test
@@ -42,4 +42,4 @@ jobs:
       - name: Test
         if: ${{ matrix.os == 'windows-latest' }}
         run: ./litecrypt_test.exe
-        working-directory: ./build/Release
+        working-directory: build\Release
