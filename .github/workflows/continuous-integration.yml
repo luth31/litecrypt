@@ -12,7 +12,7 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Create build directory and run CMake
         run: |
@@ -42,4 +42,4 @@ jobs:
       - name: Test
         if: ${{ matrix.os == 'windows-latest' }}
         run: ./litecrypt_test.exe
-        working-directory: build\Release
+        working-directory: build\Debug
