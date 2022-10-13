@@ -17,6 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Init CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: cpp
+
       - name: Create build directory and run CMake
         run: |
           mkdir build
@@ -32,10 +37,6 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Init CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: cpp
       - name: Build targets
         if: ${{ matrix.os == 'windows-latest' }}
         run: MSBuild.exe -m litecrypt.sln
